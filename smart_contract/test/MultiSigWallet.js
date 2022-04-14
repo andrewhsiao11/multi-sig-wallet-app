@@ -16,6 +16,17 @@ describe("MultiSigWallet Contract", function () {
       2
     );
   });
+
+  const submitTx = async () => {
+    await walletInstance.submitTransaction(
+      acc2.address,
+      ethers.utils.parseEther("1.0"),
+      0x00
+    );
+    const obj = await walletInstance.transactions(0);
+    return obj;
+  };
+
   describe("Deployment", () => {
     it("Should return the proper approvers and approval count", async () => {
       const contractApprovers = await walletInstance.getApprovers();
@@ -49,34 +60,54 @@ describe("MultiSigWallet Contract", function () {
       ).to.be.revertedWith("not an approver");
     });
 
-    it("Should create a transaction", async () => {
-      await walletInstance.submitTransaction(
-        acc2.address,
-        ethers.utils.parseEther("1.0"),
-        0x00
-      );
-
-      const obj = await walletInstance.transactions(0);
+    it("Should create a valid transaction", async () => {
+      const obj = await submitTx();
 
       expect(obj.to).to.equal(acc2.address);
       expect(ethers.utils.formatEther(obj.amount)).to.equal("1.0");
+      expect(obj.data).to.equal("0x00");
+      expect(obj.isExecuted).to.equal(false);
+      expect(ethers.utils.formatEther(obj.numApprovals)).to.equal("0.0");
     });
   });
 
-  // describe("Approve Transaction", () => {
-  //   it("Should only be called by an Approver", async () => {});
+  describe("Approve Transaction", () => {
+    it("Should only be called by an Approver", async () => {
+      await expect(
+        walletInstance.connect(acc4).approveTransaction(0)
+      ).to.be.revertedWith("not an approver");
+    });
 
-  //   it("Should call an existing transaction", async () => {});
+    it("Should call an existing transaction", async () => {
+      await submitTx();
+      expect(walletInstance.transactions.length == 1);
+    });
 
-  //   it("Should not be executed", async () => {});
+    it("Should not be executed", async () => {
+      const obj1 = await submitTx();
+      expect(obj1.isExecuted).to.equal(false);
+    });
 
-  //   it("Should not be approved", async () => {});
+    it("Should not be approved", async () => {
+      await submitTx();
+      expect(await walletInstance.isApproved(0, acc1.address)).to.equal(false);
+    });
 
-  //   it("Should increment approval count by 1", async () => {});
-  // });
+    it("Should increment approval count by 1", async () => {
+      await submitTx();
+      await walletInstance.approveTransaction(0);
+      const obj = await walletInstance.transactions(0);
+      expect(obj.numApprovals).to.equal(1);
+      expect(await walletInstance.isApproved(0, acc1.address)).to.equal(true);
+    });
+  });
 
-  // describe("Revoke Transaction", () => {
-  //   it("Should only be called by an Approver", async () => {});
+  // describe("Revoke Approval", () => {
+  //   it("Should only be called by an Approver", async () => {
+  //     await expect(
+  //       walletInstance.connect(acc4).revokeApproval(0)
+  //     ).to.be.revertedWith("not an approver");
+  //   });
 
   //   it("Should call an existing transaction", async () => {});
 
@@ -86,7 +117,11 @@ describe("MultiSigWallet Contract", function () {
   // });
 
   // describe("Execute Transaction", () => {
-  //   it("Should only be called by an Approver", async () => {});
+  //   it("Should only be called by an Approver", async () => {
+  //     await expect(
+  //       walletInstance.connect(acc4).executeTransaction(0)
+  //     ).to.be.revertedWith("not an approver");
+  //   });
 
   //   it("Should call an existing transaction", async () => {});
 
