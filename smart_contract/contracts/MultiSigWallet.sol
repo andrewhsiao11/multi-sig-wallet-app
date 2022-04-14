@@ -164,6 +164,8 @@ contract MultiSigWallet {
             transaction.numApprovals >= numApprovalsRequired,
             "not enough approvals"
         );
+        // need to have enough money on contract in order to execute
+        require(address(this).balance >= transaction.amount, "not enough funds in contract");
         //set executed to true
         transaction.isExecuted = true;
         // sending transaction with "address".call
