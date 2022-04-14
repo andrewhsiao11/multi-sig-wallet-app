@@ -102,19 +102,33 @@ describe("MultiSigWallet Contract", function () {
     });
   });
 
-  // describe("Revoke Approval", () => {
-  //   it("Should only be called by an Approver", async () => {
-  //     await expect(
-  //       walletInstance.connect(acc4).revokeApproval(0)
-  //     ).to.be.revertedWith("not an approver");
-  //   });
+  describe("Revoke Approval", () => {
+    it("Should only be called by an Approver", async () => {
+      await expect(
+        walletInstance.connect(acc4).revokeApproval(0)
+      ).to.be.revertedWith("not an approver");
+    });
 
-  //   it("Should call an existing transaction", async () => {});
+    it("Should call an existing transaction", async () => {
+      await submitTx();
+      expect(walletInstance.transactions.length == 1);
+    });
 
-  //   it("Should not be executed", async () => {});
+    it("Should not be executed", async () => {
+      const obj1 = await submitTx();
+      expect(obj1.isExecuted).to.equal(false);
+    });
 
-  //   it("Should ...", async () => {});
-  // });
+    it("Should decrement approval count by 1", async () => {
+      await submitTx();
+      await walletInstance.approveTransaction(0);
+      const obj1 = await walletInstance.transactions(0);
+      await walletInstance.revokeApproval(0);
+      const obj2 = await walletInstance.transactions(0);
+      expect(obj2.numApprovals).to.equal(obj1.numApprovals-1);
+      expect(await walletInstance.isApproved(0, acc1.address)).to.equal(false);
+    });
+  });
 
   // describe("Execute Transaction", () => {
   //   it("Should only be called by an Approver", async () => {
@@ -123,9 +137,15 @@ describe("MultiSigWallet Contract", function () {
   //     ).to.be.revertedWith("not an approver");
   //   });
 
-  //   it("Should call an existing transaction", async () => {});
+  //   it("Should call an existing transaction", async () => {
+  //      await submitTx();
+  //      expect(walletInstance.transactions.length == 1);
+  //   });
 
-  //   it("Should not be executed", async () => {});
+  //   it("Should not be executed", async () => {
+  //     const obj1 = await submitTx();
+  //     expect(obj1.isExecuted).to.equal(false);
+  //   });
 
   //   it("Should ...", async () => {});
   // });
