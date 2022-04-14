@@ -150,40 +150,6 @@ contract MultiSigWallet {
         emit ApproveTransaction(msg.sender, _txIndex);
     }
 
-    // to execute, must to approver,
-    // and tx must exist and not be executed
-    function executeTransaction(uint256 _txIndex)
-        public
-        onlyApprover
-        txExists(_txIndex)
-        notExecuted(_txIndex)
-    {
-        Transaction storage transaction = transactions[_txIndex];
-        // must be approved enough times
-        require(
-            transaction.numApprovals >= numApprovalsRequired,
-            "not enough approvals"
-        );
-        // need to have enough money on contract in order to execute
-        require(address(this).balance >= transaction.amount, "not enough funds in contract");
-        //set executed to true
-        transaction.isExecuted = true;
-        // sending transaction with "address".call
-        // .call{takes a value in wei, and optionally gas: in wei}(here is where data sent to another function is put)
-        //  for example: (abi.encodeWithSignature("someFunction(uint256)", _arg1))
-        // .call returns 2 args (status of call (boolean), returned data of call (tuple --> bytes memory result))
-        // the return values of the contract function called would need to be decoded using abi.decode
-        // ex: (uint a, uint b) = abi.decode(result, (uint, uint));
-        // only success/failure used here.
-        (bool success, ) = transaction.to.call{value: transaction.amount}(
-            transaction.data
-        );
-        require(success, "tx failed");
-
-        // emit who executed tx, tx index
-        emit ExecuteTransaction(msg.sender, _txIndex);
-    }
-
     // to revoke approval, must be an approver
     // tx must exist and not be executed already
     function revokeApproval(uint256 _txIndex)
@@ -205,6 +171,43 @@ contract MultiSigWallet {
 
         // emit who revoked, tx index
         emit RevokeApproval(msg.sender, _txIndex);
+    }
+
+    // to execute, must to approver,
+    // and tx must exist and not be executed
+    function executeTransaction(uint256 _txIndex)
+        public
+        onlyApprover
+        txExists(_txIndex)
+        notExecuted(_txIndex)
+    {
+        Transaction storage transaction = transactions[_txIndex];
+        // must be approved enough times
+        require(
+            transaction.numApprovals >= numApprovalsRequired,
+            "not enough approvals"
+        );
+        // need to have enough money on contract in order to execute
+        require(
+            address(this).balance >= transaction.amount,
+            "not enough funds in contract"
+        );
+        //set executed to true
+        transaction.isExecuted = true;
+        // sending transaction with "address".call
+        // .call{takes a value in wei, and optionally gas: in wei}(here is where data sent to another function is put)
+        //  for example: (abi.encodeWithSignature("someFunction(uint256)", _arg1))
+        // .call returns 2 args (status of call (boolean), returned data of call (tuple --> bytes memory result))
+        // the return values of the contract function called would need to be decoded using abi.decode
+        // ex: (uint a, uint b) = abi.decode(result, (uint, uint));
+        // only success/failure used here.
+        (bool success, ) = transaction.to.call{value: transaction.amount}(
+            transaction.data
+        );
+        require(success, "tx failed");
+
+        // emit who executed tx, tx index
+        emit ExecuteTransaction(msg.sender, _txIndex);
     }
 
     // these getters may not be neccesary since all variables are public
