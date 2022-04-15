@@ -205,7 +205,8 @@ contract MultiSigWallet {
             transaction.data
         );
         require(success, "tx failed");
-
+        // set transaction amount to zero so it cannot be reused
+        transaction.amount = 0;
         // emit who executed tx, tx index
         emit ExecuteTransaction(msg.sender, _txIndex);
     }
