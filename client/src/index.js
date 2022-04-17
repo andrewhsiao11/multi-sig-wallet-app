@@ -9,9 +9,7 @@ import { MultiSigWalletProvider } from './context/MultiSigWalletContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <MultiSigWalletProvider>
-    
       <App />
-    
   </MultiSigWalletProvider>
 );
 

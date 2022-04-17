@@ -1,28 +1,16 @@
-import './App.css';
-
-import {MultiSigWalletContext} from './context/MultiSigWalletContext'
-import React, {useContext} from 'react'
+import { Navbar, Home, Footer, Transactions } from "./components";
 
 const App = () => {
-
-const {connectWallet, currentAccount} = useContext(MultiSigWalletContext)
-
-
   return (
-    <div className="App">
-      <header className="App-header">
-
-        <h1 className="text-3xl font-bold underline">Hello world!</h1>
-
-        {!currentAccount && (
-          <button type="button" onClick={connectWallet}>
-            {" "}
-            Connect Wallet
-          </button>
-        )}
-      </header>
+    <div className="min-h-screen">
+      <div className="gradient-bg-welcome">
+        <Navbar />
+        <Home />
+      </div>
+      <Transactions />
+      <Footer />
     </div>
   );
-}
+};
 
 export default App;
