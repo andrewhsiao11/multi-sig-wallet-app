@@ -68,7 +68,7 @@ export const MultiSigWalletProvider = ({ children }) => {
       try {
           if (!ethereum) return alert("🦊 Please install metamask");
 
-          //Submit trnsaction functionality
+          //Submit transaction functionality
           
       } catch (error) {
           console.log(error);
