@@ -5,7 +5,7 @@ const App = () => {
   return (
     <Router>
       <div className="min-h-screen">
-        <div className="gradient-bg-home">
+        <div className="gradient-bg-nav">
           <Navbar />
         </div>
         <Routes>

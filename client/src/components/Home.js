@@ -1,24 +1,124 @@
 import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
-import { Transactions } from "../components";
+import { Transactions, Loader } from "../components";
+import { SiEthereum } from "react-icons/si";
+
+const Input = ({ placeholder, name, type, value, handleChange }) => (
+  <input
+    placeholder={placeholder}
+    type={type}
+    step="0.0001"
+    value={value}
+    onChange={(e) => handleChange(e, name)}
+    className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glass"
+  />
+);
 
 const Home = () => {
-
-const { connectWallet, currentAccount } = useContext(MultiSigWalletContext);
+  const { connectWallet, currentAccount } = useContext(MultiSigWalletContext);
 
   return (
-    <div className="gradient-bg-home">
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+    <>
+      <div className="flex w-full justify-center items-center gradient-bg-home">
+        <div className="flex mf:flex-row flex-col items-start justify-between md:p-20 py-12 px-4">
+          <div className="flex flex-1 justify-start items-start flex-col mf:mr-10">
+            <h1 className="text-3xl sm:text-5xl text-white py-1">
+              Welcome to your dashboard
+            </h1>
+            <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
+              {currentAccount
+                ? "View all transactions below. Submit, approve, and revoke transactions in the sections below."
+                : "Connect your Metamask wallet to begin."}
+            </p>
 
-      {!currentAccount && (
-        <button type="button" onClick={connectWallet}>
-          Connect Wallet
-        </button>
-      )}
+            {!currentAccount ? (
+              <button
+                type="button"
+                onClick={connectWallet}
+                className="flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]"
+              >
+                <p className="text-white text-base font-semibold">
+                  Connect Wallet
+                </p>
+              </button>
+            ) : (
+              <>
+                <div className="p-4 sm:w-96 w-full flex flex-col justify-start items-center blue-glass mt-7">
+                  <form className="w-full max-w-sm">
+                    <div className="flex items-center">
+                      <div className="flex -ml-2">
+                        <SiEthereum fontSize={21} color="#fff" />
+                      </div>
+                      <Input
+                        placeholder="Amount (ETH)"
+                        name="amount"
+                        type="number"
+                        handleChange={() => {}}
+                      ></Input>
+                      <button
+                        className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                        type="button"
+                      >
+                        Add Ether
+                      </button>
+                    </div>
+                  </form>
 
+                  <div className="flex">
+                    <p className="text-white">Contract Balance: {} ETH</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col flex-1 items-center justify-start w-full mf:mt-0 mt-10">
+          <div className="p-3 flex justify-end items-start flex-col rounded-xl h-15 sm:w-72 w-full my-5 eth-card .white-glass">
+            <div className="flex justify-between flex-col w-full h-full">
+              <div className="flex items-start">
+                <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
+                  <SiEthereum fontSize={21} color="#fff" />
+                </div>
+                <div className="ml-4 mt-2">
+                  <p className="text-white font-light text-sm ">address</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
+            <Input
+              placeholder="Address To"
+              name="addressTo"
+              type="text"
+              handleChange={() => {}}
+            />
+            <Input
+              placeholder="Amount (ETH)"
+              name="amount"
+              type="number"
+              handleChange={() => {}}
+            />
+            <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
+              {false ? (
+                <Loader />
+              ) : (
+                <button
+                  type="button"
+                  // onClick={handleSubmit}
+                  className="text-white w-full mt-3 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
+                >
+                  Send now
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       <Transactions />
-    </div>
+    </>
   );
-}
+};
 
-export default Home
+export default Home;
