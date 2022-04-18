@@ -44,7 +44,6 @@ const Home = () => {
     e.preventDefault()
     sendEther()
     setEtherAmount(0)
-   
     }
 
   return (

@@ -31,7 +31,7 @@ const getEthereumContract = () => {
 export const MultiSigWalletProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [formData, setFormData] = useState({
-      addressTo: "", amount: "", data: "0x00"
+      addressTo: "", amount: 0, data: "0x00"
   })
   const [etherAmount, setEtherAmount] = useState(0);
   const [contractBalance, setContractBalance] = useState();
@@ -135,11 +135,19 @@ export const MultiSigWalletProvider = ({ children }) => {
 
           //Submit transaction functionality
           const { addressTo, amount, data } = formData;
+          const parsedAmount = ethers.utils.parseEther(amount);
           // getting contract instance - can now use this variable to call any function from smart contract
           const MultiSigWalletContract = getEthereumContract()
-          console.log(formData);
-          console.log(MultiSigWalletContract);
-          console.log(ethers.utils.formatEther(await MultiSigWalletContract.provider.getBalance(contractAddress)));
+
+         const txHash = await MultiSigWalletContract.submitTransaction(addressTo, parsedAmount, data);
+         setIsLoading(true);
+         console.log(`Loading - ${txHash.hash}`);
+        await txHash.wait();
+         setIsLoading(false);
+         console.log(`Success - ${txHash.hash}`);
+
+         const transaction = await MultiSigWalletContract.getTransaction(0);
+         console.log(transaction);
           
       } catch (error) {
           console.log(error);
