@@ -3,6 +3,7 @@ import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
 import { Transactions, Loader } from "../components";
 import { SiEthereum } from "react-icons/si";
 
+// simple input component for reusability
 const Input = ({ placeholder, name, type, value, handleChange }) => (
   <input
     placeholder={placeholder}
@@ -15,7 +16,36 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Home = () => {
-  const { connectWallet, currentAccount } = useContext(MultiSigWalletContext);
+  const {
+    connectWallet,
+    currentAccount,
+    formData,
+    handleChange,
+    submitTransaction,
+    sendEther,
+    handleSendEtherChange,
+    etherAmount,
+    setEtherAmount,
+    contractBalance
+  } = useContext(MultiSigWalletContext);
+
+  const handleSubmit = (e) => { 
+    //destructure from formData
+    const {addressTo, amount, data} = formData
+    e.preventDefault()
+
+    if(!addressTo || !amount) return;
+
+    submitTransaction();
+   }
+
+   const handleSendEther = (e) => { 
+    if(etherAmount <=0 ) return;
+    e.preventDefault()
+    sendEther()
+    setEtherAmount(0)
+   
+    }
 
   return (
     <>
@@ -49,15 +79,19 @@ const Home = () => {
                       <div className="flex -ml-2">
                         <SiEthereum fontSize={21} color="#fff" />
                       </div>
-                      <Input
+                      <input
                         placeholder="Amount (ETH)"
-                        name="amount"
+                        name="etherAmount"
                         type="number"
-                        handleChange={() => {}}
-                      ></Input>
+                        step="0.0001"
+                        // value={etherAmount}
+                        onChange={handleSendEtherChange}
+                        className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glass"
+                      ></input>
                       <button
                         className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
                         type="button"
+                        onClick={handleSendEther}
                       >
                         Add Ether
                       </button>
@@ -65,7 +99,7 @@ const Home = () => {
                   </form>
 
                   <div className="flex">
-                    <p className="text-white">Contract Balance: {} ETH</p>
+                    <p className="text-white">Contract Balance: {contractBalance} ETH</p>
                   </div>
                 </div>
               </>
@@ -92,13 +126,13 @@ const Home = () => {
               placeholder="Address To"
               name="addressTo"
               type="text"
-              handleChange={() => {}}
+              handleChange={handleChange}
             />
             <Input
               placeholder="Amount (ETH)"
               name="amount"
               type="number"
-              handleChange={() => {}}
+              handleChange={handleChange}
             />
             <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
               {false ? (
@@ -106,7 +140,7 @@ const Home = () => {
               ) : (
                 <button
                   type="button"
-                  // onClick={handleSubmit}
+                  onClick={handleSubmit}
                   className="text-white w-full mt-3 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
                 >
                   Send now

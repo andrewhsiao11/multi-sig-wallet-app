@@ -20,6 +20,8 @@ const getEthereumContract = () => {
     contractABI,
     signer
   );
+  // if console.log this you can see all the functions of smart contract
+  return MultiSigWalletContract
 };
 
 // contract provider always gets children
@@ -28,6 +30,27 @@ const getEthereumContract = () => {
 // will have access to the value object
 export const MultiSigWalletProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [formData, setFormData] = useState({
+      addressTo: "", amount: "", data: "0x00"
+  })
+  const [etherAmount, setEtherAmount] = useState(0);
+  const [contractBalance, setContractBalance] = useState();
+  const [isLoading, setIsLoading] = useState(false)
+
+  const getContractBalance = async () => {
+    const MultiSigWalletContract = getEthereumContract();
+    const balance = ethers.utils.formatEther(
+      await MultiSigWalletContract.provider.getBalance(contractAddress)
+    );
+    setContractBalance(balance);
+  }
+
+  // setting each form value to whats typed in based on "name"
+  const handleChange = (e, name) => {
+      setFormData((prevState) =>  ({
+          ...prevState, [name]: e.target.value
+      }))
+  }
 
   const checkIfWalletisConnected = async () => {
     try {
@@ -52,7 +75,7 @@ export const MultiSigWalletProvider = ({ children }) => {
   const connectWallet = async () => {
     try {
       if (!ethereum) return alert("🦊 Please install metamask");
-      // connect metamaks accounts to Dapp
+      // connect Metamask accounts to Dapp
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
@@ -64,11 +87,59 @@ export const MultiSigWalletProvider = ({ children }) => {
     }
   };
 
+  const handleSendEtherChange = (e) => {
+      setEtherAmount(e.target.value)
+  }
+
+  const sendEther = async () => {
+    try {
+      if (!ethereum) return alert("🦊 Please install metamask");
+
+      console.log("ether is being sent to: " + contractAddress);
+      // needs to be converted to hexadecimal
+      const parsedEtherAmount = ethers.utils.parseEther(etherAmount);
+        try {
+             const txHash = await ethereum
+              .request({
+                method: "eth_sendTransaction",
+                params: [
+                  {
+                    from: currentAccount,
+                    to: contractAddress,
+                    //   gas: "0x5208", // hexadecimal for 21000 gwei --> this is optional (it would fail if i specify)
+                    value: parsedEtherAmount._hex,
+                  },
+                ],
+              })
+                setIsLoading(true);
+                console.log("loading");
+                const MultiSigWalletContract = getEthereumContract();
+                await MultiSigWalletContract.provider.once(txHash, (transaction) => {
+                    setIsLoading(false);
+                    console.log("Success! Transaction mined: " + txHash);
+                    getContractBalance()
+                });
+        } catch (error) {
+            console.log(error);
+            throw new Error("Transaction was declined or failed")
+        }
+    } catch (error) {
+      console.log(error);
+      throw new Error("😢 No ethereum object");
+    }
+  };
+
   const submitTransaction = async () => {
       try {
           if (!ethereum) return alert("🦊 Please install metamask");
 
           //Submit transaction functionality
+          const { addressTo, amount, data } = formData;
+          // getting contract instance - can now use this variable to call any function from smart contract
+          const MultiSigWalletContract = getEthereumContract()
+          console.log(formData);
+          console.log(MultiSigWalletContract);
+          console.log(ethers.utils.formatEther(await MultiSigWalletContract.provider.getBalance(contractAddress)));
           
       } catch (error) {
           console.log(error);
@@ -78,10 +149,26 @@ export const MultiSigWalletProvider = ({ children }) => {
 
   useEffect(() => {
     checkIfWalletisConnected();
+    getContractBalance()
   }, []);
 
+  // wrap around everything and all components have access to data passed into value
   return (
-    <MultiSigWalletContext.Provider value={{ connectWallet, currentAccount }}>
+    <MultiSigWalletContext.Provider
+      value={{
+        connectWallet,
+        currentAccount,
+        formData,
+        setFormData,
+        handleChange,
+        submitTransaction,
+        sendEther,
+        handleSendEtherChange,
+        etherAmount,
+        setEtherAmount,
+        contractBalance
+      }}
+    >
       {children}
     </MultiSigWalletContext.Provider>
   );
