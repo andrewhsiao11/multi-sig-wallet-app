@@ -36,6 +36,7 @@ export const MultiSigWalletProvider = ({ children }) => {
   const [etherAmount, setEtherAmount] = useState(0);
   const [contractBalance, setContractBalance] = useState();
   const [isLoading, setIsLoading] = useState(false)
+  const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'))
 
   const getContractBalance = async () => {
     const MultiSigWalletContract = getEthereumContract();
@@ -145,15 +146,43 @@ export const MultiSigWalletProvider = ({ children }) => {
         await txHash.wait();
          setIsLoading(false);
          console.log(`Success - ${txHash.hash}`);
+         
 
-         const transaction = await MultiSigWalletContract.getTransaction(0);
-         console.log(transaction);
+        const transactionCount = await MultiSigWalletContract.getTransactionCount();
+        setTransactionCount(transactionCount.toNumber());
+        
+
+        //  const transaction = await MultiSigWalletContract.getTransaction(0);
+        //  console.log(transaction);
           
       } catch (error) {
           console.log(error);
           throw new Error("😢 No ethereum object");
       }
   }
+
+
+//   const approveTransaction = async () => {
+//     try {
+//       if (!ethereum) return alert("🦊 Please install metamask");
+
+      
+//       const MultiSigWalletContract = getEthereumContract();
+
+//       const txHash = await MultiSigWalletContract.submitTransaction(txIndex);
+//       setIsLoading(true);
+//       console.log(`Loading - ${txHash.hash}`);
+//       await txHash.wait();
+//       setIsLoading(false);
+//       console.log(`Success - ${txHash.hash}`);
+
+//     //   const transaction = await MultiSigWalletContract.getTransaction(0);
+//     //   console.log(transaction);
+//     } catch (error) {
+//       console.log(error);
+//       throw new Error("😢 No ethereum object");
+//     }
+//   };
 
   useEffect(() => {
     checkIfWalletisConnected();
@@ -174,7 +203,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         handleSendEtherChange,
         etherAmount,
         setEtherAmount,
-        contractBalance
+        contractBalance,
+        transactionCount
       }}
     >
       {children}

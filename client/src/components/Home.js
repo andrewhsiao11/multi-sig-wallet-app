@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
 import { Transactions, Loader } from "../components";
 import { SiEthereum } from "react-icons/si";
+import {shortenAddress} from "../utils/shortenAddress"
 
 // simple input component for reusability
 const Input = ({ placeholder, name, type, value, handleChange }) => (
@@ -20,13 +21,15 @@ const Home = () => {
     connectWallet,
     currentAccount,
     formData,
+    setFormData,
     handleChange,
     submitTransaction,
     sendEther,
     handleSendEtherChange,
     etherAmount,
     setEtherAmount,
-    contractBalance
+    contractBalance,
+    // transactionCount
   } = useContext(MultiSigWalletContext);
 
   const handleSubmit = (e) => { 
@@ -37,6 +40,7 @@ const Home = () => {
     if(!addressTo || !amount) return;
 
     submitTransaction();
+    setFormData({ addressTo: "", amount: 0, data: "0x00" });
    }
 
    const handleSendEther = (e) => { 
@@ -114,7 +118,7 @@ const Home = () => {
                   <SiEthereum fontSize={21} color="#fff" />
                 </div>
                 <div className="ml-4 mt-2">
-                  <p className="text-white font-light text-sm ">address</p>
+                  <p className="text-white font-light text-sm ">{currentAccount ? shortenAddress(currentAccount) : "Log in to see your account"}</p>
                 </div>
               </div>
             </div>
