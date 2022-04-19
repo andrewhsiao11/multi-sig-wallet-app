@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
-import { Transactions, Loader } from "../components";
+import { Transactions, Loader, Approvers } from "../components";
 import { SiEthereum } from "react-icons/si";
 import {shortenAddress} from "../utils/shortenAddress"
 
@@ -29,7 +29,6 @@ const Home = () => {
     etherAmount,
     setEtherAmount,
     contractBalance,
-    // transactionCount
   } = useContext(MultiSigWalletContext);
 
   const handleSubmit = (e) => { 
@@ -153,6 +152,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <Approvers/>
       <Transactions />
     </>
   );

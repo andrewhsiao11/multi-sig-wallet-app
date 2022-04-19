@@ -37,6 +37,10 @@ export const MultiSigWalletProvider = ({ children }) => {
   const [contractBalance, setContractBalance] = useState();
   const [isLoading, setIsLoading] = useState(false)
   const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'))
+  const [approvers, setApprovers] = useState(
+    localStorage.getItem("approvers")
+  );
+
 
   const getContractBalance = async () => {
     const MultiSigWalletContract = getEthereumContract();
@@ -45,6 +49,18 @@ export const MultiSigWalletProvider = ({ children }) => {
     );
     setContractBalance(balance);
   }
+
+  const getTxCount = async () => {
+      const MultiSigWalletContract = getEthereumContract();
+      const txCount = await MultiSigWalletContract.getTransactionCount();
+      setTransactionCount(txCount.toNumber());
+  }
+
+  const getApproverArray = async () => {
+    const MultiSigWalletContract = getEthereumContract();
+    const approverArray = await MultiSigWalletContract.getApprovers();
+    setApprovers(approverArray)
+  };
 
   // setting each form value to whats typed in based on "name"
   const handleChange = (e, name) => {
@@ -148,8 +164,7 @@ export const MultiSigWalletProvider = ({ children }) => {
          console.log(`Success - ${txHash.hash}`);
          
 
-        const transactionCount = await MultiSigWalletContract.getTransactionCount();
-        setTransactionCount(transactionCount.toNumber());
+        getTxCount();
         
 
         //  const transaction = await MultiSigWalletContract.getTransaction(0);
@@ -184,9 +199,12 @@ export const MultiSigWalletProvider = ({ children }) => {
 //     }
 //   };
 
+
   useEffect(() => {
     checkIfWalletisConnected();
     getContractBalance()
+    getTxCount()
+    getApproverArray()
   }, []);
 
   // wrap around everything and all components have access to data passed into value
@@ -204,7 +222,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         etherAmount,
         setEtherAmount,
         contractBalance,
-        transactionCount
+        transactionCount,
+        approvers
       }}
     >
       {children}
