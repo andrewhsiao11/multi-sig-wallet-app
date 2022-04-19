@@ -1,9 +1,13 @@
 import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
-import { shortenAddress } from "../utils/shortenAddress";
+import approval_icon from "../images/approval_icon.png";
+import approver_mask from "../images/approver_mask.png";
+import approver_walterWhite from "../images/approver_walterWhite.png";
+import approver_mando from "../images/approver_mando.png";
+
 
 const Approvers = () => {
-    const { currentAccount, transactionCount, approvers } = useContext(
+    const { transactionCount, approvers } = useContext(
       MultiSigWalletContext
     );
 
@@ -15,7 +19,7 @@ const Approvers = () => {
             <div className="flex items-center border-b border-gray-400 pb-4">
               <div className="flex items-start justify-between w-full">
                 <img
-                  src="https://cdn.tuk.dev/assets/components/misc/doge-coin.png"
+                  src={approval_icon}
                   className="w-10 h-10 rounded-full"
                 />
                 <div className="ml-1 w-1/2  mt-2 mr-10">
@@ -30,28 +34,28 @@ const Approvers = () => {
             </div>
             <div className="px-2 flex mt-2 mr-3 -ml-2">
               <img
-                src="https://cdn.tuk.dev/assets/components/misc/doge-coin.png"
-                className="w-10 h-10 rounded-full"
+                src={approver_mando}
+                className="w-12 h-12 rounded-full"
               />
-              <p className="text-sm leading-5 ml-4 mt-2.5 text-gray-300">
+              <p className="text-sm leading-5 ml-2 mt-3 text-gray-300">
                 {approvers[0]}
               </p>
             </div>
             <div className="px-2 flex mt-2 mr-3 -ml-2">
               <img
-                src="https://cdn.tuk.dev/assets/components/misc/doge-coin.png"
-                className="w-10 h-10 rounded-full"
+                src={approver_mask}
+                className="w-12 h-12 rounded-full"
               />
-              <p className="text-sm leading-5 ml-4 mt-2.5 text-gray-300">
+              <p className="text-sm leading-5 ml-2 mt-3 text-gray-300">
                 {approvers[1]}
               </p>
             </div>
             <div className="px-2 flex mt-2 mr-3 -ml-2">
               <img
-                src="https://cdn.tuk.dev/assets/components/misc/doge-coin.png"
-                className="w-10 h-10 rounded-full"
+                src={approver_walterWhite}
+                className="w-12 h-12 rounded-full"
               />
-              <p className="text-sm leading-5 ml-4 mt-2.5 text-gray-300">
+              <p className="text-sm leading-5 ml-2 mt-3 text-gray-300">
                 {approvers[2]}
               </p>
             </div>

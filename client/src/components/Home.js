@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
 import { Transactions, Loader, Approvers } from "../components";
 import { SiEthereum } from "react-icons/si";
-import {shortenAddress} from "../utils/shortenAddress"
+import { shortenAddress } from "../utils/shortenAddress";
 
 // simple input component for reusability
 const Input = ({ placeholder, name, type, value, handleChange }) => (
@@ -31,23 +31,23 @@ const Home = () => {
     contractBalance,
   } = useContext(MultiSigWalletContext);
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = (e) => {
     //destructure from formData
-    const {addressTo, amount, data} = formData
-    e.preventDefault()
+    const { addressTo, amount} = formData;
+    e.preventDefault();
 
-    if(!addressTo || !amount) return;
+    if (!addressTo || !amount) return;
 
     submitTransaction();
-    setFormData({ addressTo: "", amount: 0, data: "0x00" });
-   }
+    setFormData({ addressTo: "", amount: 0 });
+  };
 
-   const handleSendEther = (e) => { 
-    if(etherAmount <=0 ) return;
-    e.preventDefault()
-    sendEther()
-    setEtherAmount(0)
-    }
+  const handleSendEther = (e) => {
+    if (etherAmount <= 0) return;
+    e.preventDefault();
+    sendEther();
+    setEtherAmount(0);
+  };
 
   return (
     <>
@@ -101,7 +101,9 @@ const Home = () => {
                   </form>
 
                   <div className="flex">
-                    <p className="text-white">Contract Balance: {contractBalance} ETH</p>
+                    <p className="text-white">
+                      Contract Balance: {contractBalance} ETH
+                    </p>
                   </div>
                 </div>
               </>
@@ -117,7 +119,11 @@ const Home = () => {
                   <SiEthereum fontSize={21} color="#fff" />
                 </div>
                 <div className="ml-4 mt-2">
-                  <p className="text-white font-light text-sm ">{currentAccount ? shortenAddress(currentAccount) : "Log in to see your account"}</p>
+                  <p className="text-white font-light text-sm ">
+                    {currentAccount
+                      ? shortenAddress(currentAccount)
+                      : "Log in to see your account"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -152,7 +158,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <Approvers/>
+      <Approvers />
       <Transactions />
     </>
   );

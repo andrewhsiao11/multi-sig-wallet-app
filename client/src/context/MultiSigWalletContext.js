@@ -37,9 +37,7 @@ export const MultiSigWalletProvider = ({ children }) => {
   const [contractBalance, setContractBalance] = useState();
   const [isLoading, setIsLoading] = useState(false)
   const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'))
-  const [approvers, setApprovers] = useState(
-    localStorage.getItem("approvers")
-  );
+  const [approvers, setApprovers] = useState([]);
 
 
   const getContractBalance = async () => {
