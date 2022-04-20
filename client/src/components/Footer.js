@@ -10,7 +10,7 @@ const Footer = () => {
 
       <div className="flex justify-center items-center flex-col mt-5">
         <p className="text-white text-sm text-center">
-          Welcome to the future of financial managment.
+          Welcome to the future of joint financial managment.
         </p>
         <p className="text-white underline text-sm text-center font-medium mt-2">
           <a href="/about">About this project</a>

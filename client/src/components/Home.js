@@ -59,7 +59,7 @@ const Home = () => {
             </h1>
             <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
               {currentAccount
-                ? "View all transactions below. Submit, approve, and revoke transactions in the sections below."
+                ? "View all transactions below. Submit transactions here. Approve and revoke in your profile."
                 : "Connect your Metamask wallet to begin."}
             </p>
 

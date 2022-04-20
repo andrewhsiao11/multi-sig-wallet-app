@@ -1,31 +1,72 @@
 import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
 import { SiEthereum } from "react-icons/si";
-import { shortenAddress } from "../utils/shortenAddress";
 
 const Profile = () => {
   const {
     connectWallet,
     currentAccount,
-    formData,
-    setFormData,
-    handleChange,
-    submitTransaction,
-    sendEther,
-    handleSendEtherChange,
-    etherAmount,
-    setEtherAmount,
-    contractBalance,
+    transactionArray,
+    handleGetTxIndexChange,
+    txIndex,
+    getUserApprovalStatus,
+    approvalStatus
   } = useContext(MultiSigWalletContext);
+
+  const handleGetTxIndex = (e) => {
+    // handle not a valid transaction
+    if (txIndex >= transactionArray.length || txIndex < 0)
+      return alert("Transaction does not exist at that index");
+    e.preventDefault();
+    getUserApprovalStatus(txIndex, currentAccount);
+  };
 
   return (
     <>
       {currentAccount ? (
         <>
           <div className="flex w-full justify-center items-center gradient-bg-home">
-            <div className="flex mf:flex-row  items-start justify-between md:p-20 py-12 px-4">
-              <div>Hello</div>
-              <div className="flex flex-col flex-1 items-center justify-start w-full mf:mt-0">
+            <div className="flex mf:flex-row  items-start justify-between md:p-8 py-12 px-4">
+              <div className="flex flex-1 justify-start items-start flex-col mf:mr-10">
+                <h1 className="text-3xl sm:text-5xl text-white py-1">
+                  Welcome User
+                </h1>
+                <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
+                  Search for a transaction here and approve and revoke below.
+                </p>
+                <div className="p-4 sm:w-96 w-full flex flex-col justify-start items-center blue-glass mt-7">
+                  <form className="w-full max-w-sm">
+                    <div className="flex items-center">
+                      <input
+                        placeholder="Transaction index"
+                        name="transactionIndex"
+                        type="number"
+                        step="1"
+                        min="0"
+                        max={transactionArray.length - 1}
+                        // value={etherAmount}
+                        onChange={handleGetTxIndexChange}
+                        className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glass"
+                      ></input>
+                      <button
+                        className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                        type="button"
+                        onClick={handleGetTxIndex}
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="flex">
+                    {approvalStatus === null ? "" : 
+                    (<p className="text-white">
+                      Approved by you: {approvalStatus ? "✅" : "❌"}
+                    </p>)}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col flex-1 items-center justify-start w-full mf:mt-0  mt-10">
                 <div className="p-3 flex justify-end items-start flex-col rounded-xl h-15 w-full my-5 eth-card .white-glass">
                   <div className="flex justify-between flex-col w-full h-full">
                     <div className="flex items-start">
@@ -45,7 +86,19 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            {/* <div className="flex justify-center py-6">
+              <h1 className="text-3xl sm:text-5xl text-white py-1 mr-10">
+                Welcome
+              </h1>
+            </div> */}
+          </div>
+          {/*  */}
+          <div className="flex w-full justify-center items-center gradient-bg-approvers">
+            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4">
               <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
+                <input type="text" name="" id=""></input>
+                <br />
                 <input type="text" name="" id=""></input>
 
                 <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">

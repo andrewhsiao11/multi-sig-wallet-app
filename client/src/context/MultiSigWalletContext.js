@@ -48,6 +48,8 @@ export const MultiSigWalletProvider = ({ children }) => {
     "0x48d800b04522671e2d63bf7d5fc70b818df499c42a47ab019bebb19f7b8ffe0c",
     "0x4ab6bdb7f373d7bf7cf72b54cace8c9ba4b44c3fa3a11d40ea8b9f19dcf69532",
   ]);
+  const [txIndex, setTxIndex] = useState(null)
+  const [approvalStatus, setApprovalStatus] = useState(null);
 
   const getContractBalance = async () => {
     const MultiSigWalletContract = getEthereumContract();
@@ -87,6 +89,18 @@ export const MultiSigWalletProvider = ({ children }) => {
     }
   };
 
+  const handleGetTxIndexChange = (e) => {
+      setTxIndex((prev) => prev = e.target.value)
+      console.log(txIndex);
+  }
+
+  const getUserApprovalStatus = async (txIndex, currentAccount) => {
+        const MultiSigWalletContract = getEthereumContract();
+        const approvalStatus = await MultiSigWalletContract.isApproved(txIndex, currentAccount);
+        setApprovalStatus(approvalStatus);
+        console.log(approvalStatus);
+  }
+
   // setting each form value to whats typed in based on "name"
   const handleChange = (e, name) => {
     setFormData((prevState) => ({
@@ -100,11 +114,13 @@ export const MultiSigWalletProvider = ({ children }) => {
       if (!ethereum) return alert("🦊 Please install metamask");
       // get metamask connected accounts
       const accounts = await ethereum.request({ method: "eth_accounts" });
-
       // Check if there is at least one account connected
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
 
+        window.ethereum.on("accountsChanged", (accounts1) => {
+          setCurrentAccount(accounts1[0])
+        });
         // get All Transactions...
         getTxArray();
       } else {
@@ -256,6 +272,10 @@ export const MultiSigWalletProvider = ({ children }) => {
         transactionCount,
         approvers,
         transactionArray,
+        handleGetTxIndexChange,
+        txIndex,
+        getUserApprovalStatus,
+        approvalStatus
       }}
     >
       {children}
