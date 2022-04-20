@@ -21,7 +21,7 @@ const getEthereumContract = () => {
     signer
   );
   // if console.log this you can see all the functions of smart contract
-  return MultiSigWalletContract
+  return MultiSigWalletContract;
 };
 
 // contract provider always gets children
@@ -31,14 +31,23 @@ const getEthereumContract = () => {
 export const MultiSigWalletProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [formData, setFormData] = useState({
-      addressTo: "", amount: 0, data: "0x00"
-  })
+    addressTo: "",
+    amount: 0,
+    data: "0x00",
+  });
   const [etherAmount, setEtherAmount] = useState(0);
   const [contractBalance, setContractBalance] = useState();
-  const [isLoading, setIsLoading] = useState(false)
-  const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'))
+  const [isLoading, setIsLoading] = useState(false);
+  const [transactionCount, setTransactionCount] = useState(
+    localStorage.getItem("transactionCount")
+  );
   const [approvers, setApprovers] = useState([]);
-
+  const [transactionArray, setTransactionArray] = useState([]);
+  const [txHash, setTxHash] = useState([
+    "0x1b1365cdc8f14f5fdec982ac8554db8b5628c0ee866c5e37aac88b9847bb5aa1",
+    "0x48d800b04522671e2d63bf7d5fc70b818df499c42a47ab019bebb19f7b8ffe0c",
+    "0x4ab6bdb7f373d7bf7cf72b54cace8c9ba4b44c3fa3a11d40ea8b9f19dcf69532",
+  ]);
 
   const getContractBalance = async () => {
     const MultiSigWalletContract = getEthereumContract();
@@ -46,26 +55,45 @@ export const MultiSigWalletProvider = ({ children }) => {
       await MultiSigWalletContract.provider.getBalance(contractAddress)
     );
     setContractBalance(balance);
-  }
+  };
 
   const getTxCount = async () => {
-      const MultiSigWalletContract = getEthereumContract();
-      const txCount = await MultiSigWalletContract.getTransactionCount();
-      setTransactionCount(txCount.toNumber());
-  }
+    const MultiSigWalletContract = getEthereumContract();
+    const txCount = await MultiSigWalletContract.getTransactionCount();
+    setTransactionCount(txCount.toNumber());
+  };
 
   const getApproverArray = async () => {
     const MultiSigWalletContract = getEthereumContract();
     const approverArray = await MultiSigWalletContract.getApprovers();
-    setApprovers(approverArray)
+    setApprovers(approverArray);
+  };
+
+  const getTxArray = async () => {
+    if (ethereum) {
+      const MultiSigWalletContract = getEthereumContract();
+      const txCount = await MultiSigWalletContract.getTransactionCount();
+      for (let i = 0; i < txCount.toNumber(); i++) {
+        let tx = await MultiSigWalletContract.getTransaction(i);
+        const structuredTxObj = {
+          addressTo: tx.to,
+          amount: parseInt(tx.amount._hex) / 10 ** 18,
+          isExecuted: tx.isExecuted,
+          numApprovals: parseInt(tx.numApprovals._hex),
+          txHash: txHash[i],
+        };
+        setTransactionArray((current) => [...current, structuredTxObj]);
+      }
+    }
   };
 
   // setting each form value to whats typed in based on "name"
   const handleChange = (e, name) => {
-      setFormData((prevState) =>  ({
-          ...prevState, [name]: e.target.value
-      }))
-  }
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: e.target.value,
+    }));
+  };
 
   const checkIfWalletisConnected = async () => {
     try {
@@ -77,7 +105,8 @@ export const MultiSigWalletProvider = ({ children }) => {
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
 
-        // getAllTransactions()
+        // get All Transactions...
+        getTxArray();
       } else {
         console.log("😢 No accounts found");
       }
@@ -96,6 +125,9 @@ export const MultiSigWalletProvider = ({ children }) => {
       });
 
       setCurrentAccount(accounts[0]);
+      getApproverArray();
+      getTxCount();
+      getTxArray();
     } catch (error) {
       console.log(error);
       throw new Error("😢 No ethereum object");
@@ -103,8 +135,8 @@ export const MultiSigWalletProvider = ({ children }) => {
   };
 
   const handleSendEtherChange = (e) => {
-      setEtherAmount(e.target.value)
-  }
+    setEtherAmount(e.target.value);
+  };
 
   const sendEther = async () => {
     try {
@@ -113,31 +145,30 @@ export const MultiSigWalletProvider = ({ children }) => {
       console.log("ether is being sent to: " + contractAddress);
       // needs to be converted to hexadecimal
       const parsedEtherAmount = ethers.utils.parseEther(etherAmount);
-        try {
-             const txHash = await ethereum
-              .request({
-                method: "eth_sendTransaction",
-                params: [
-                  {
-                    from: currentAccount,
-                    to: contractAddress,
-                    //   gas: "0x5208", // hexadecimal for 21000 gwei --> this is optional (it would fail if i specify)
-                    value: parsedEtherAmount._hex,
-                  },
-                ],
-              })
-                setIsLoading(true);
-                console.log("loading");
-                const MultiSigWalletContract = getEthereumContract();
-                await MultiSigWalletContract.provider.once(txHash, (transaction) => {
-                    setIsLoading(false);
-                    console.log("Success! Transaction mined: " + txHash);
-                    getContractBalance()
-                });
-        } catch (error) {
-            console.log(error);
-            throw new Error("Transaction was declined or failed")
-        }
+      try {
+        const txHash = await ethereum.request({
+          method: "eth_sendTransaction",
+          params: [
+            {
+              from: currentAccount,
+              to: contractAddress,
+              //   gas: "0x5208", // hexadecimal for 21000 gwei --> this is optional (it would fail if i specify)
+              value: parsedEtherAmount._hex,
+            },
+          ],
+        });
+        setIsLoading(true);
+        console.log("loading");
+        const MultiSigWalletContract = getEthereumContract();
+        await MultiSigWalletContract.provider.once(txHash, (transaction) => {
+          setIsLoading(false);
+          console.log("Success! Transaction mined: " + txHash);
+          getContractBalance();
+        });
+      } catch (error) {
+        console.log(error);
+        throw new Error("Transaction was declined or failed");
+      }
     } catch (error) {
       console.log(error);
       throw new Error("😢 No ethereum object");
@@ -145,64 +176,66 @@ export const MultiSigWalletProvider = ({ children }) => {
   };
 
   const submitTransaction = async () => {
-      try {
-          if (!ethereum) return alert("🦊 Please install metamask");
+    try {
+      if (!ethereum) return alert("🦊 Please install metamask");
 
-          //Submit transaction functionality
-          const { addressTo, amount, data } = formData;
-          const parsedAmount = ethers.utils.parseEther(amount);
-          // getting contract instance - can now use this variable to call any function from smart contract
-          const MultiSigWalletContract = getEthereumContract()
+      //Submit transaction functionality
+      const { addressTo, amount, data } = formData;
+      const parsedAmount = ethers.utils.parseEther(amount);
+      // getting contract instance - can now use this variable to call any function from smart contract
+      const MultiSigWalletContract = getEthereumContract();
 
-         const txHash = await MultiSigWalletContract.submitTransaction(addressTo, parsedAmount, data);
-         setIsLoading(true);
-         console.log(`Loading - ${txHash.hash}`);
-        await txHash.wait();
-         setIsLoading(false);
-         console.log(`Success - ${txHash.hash}`);
-         
+      const txHash = await MultiSigWalletContract.submitTransaction(
+        addressTo,
+        parsedAmount,
+        data
+      );
+      setIsLoading(true);
+      console.log(`Loading - ${txHash.hash}`);
+      await txHash.wait();
+      setIsLoading(false);
+      console.log(`Success - ${txHash.hash}`);
 
-        getTxCount();
-        
+      setTxHash((current) => current.push(txHash.hash));
+      // reloading components
+      getTxCount();
+      setTransactionArray([]);
+      getTxArray();
+      //  const transaction = await MultiSigWalletContract.getTransaction(0);
+      //  console.log(transaction);
+    } catch (error) {
+      console.log(error);
+      throw new Error("😢 No ethereum object");
+    }
+  };
 
-        //  const transaction = await MultiSigWalletContract.getTransaction(0);
-        //  console.log(transaction);
-          
-      } catch (error) {
-          console.log(error);
-          throw new Error("😢 No ethereum object");
-      }
-  }
+  //   const approveTransaction = async () => {
+  //     try {
+  //       if (!ethereum) return alert("🦊 Please install metamask");
 
+  //       const MultiSigWalletContract = getEthereumContract();
 
-//   const approveTransaction = async () => {
-//     try {
-//       if (!ethereum) return alert("🦊 Please install metamask");
+  //       const txHash = await MultiSigWalletContract.submitTransaction(txIndex);
+  //       setIsLoading(true);
+  //       console.log(`Loading - ${txHash.hash}`);
+  //       await txHash.wait();
+  //       setIsLoading(false);
+  //       console.log(`Success - ${txHash.hash}`);
 
-      
-//       const MultiSigWalletContract = getEthereumContract();
-
-//       const txHash = await MultiSigWalletContract.submitTransaction(txIndex);
-//       setIsLoading(true);
-//       console.log(`Loading - ${txHash.hash}`);
-//       await txHash.wait();
-//       setIsLoading(false);
-//       console.log(`Success - ${txHash.hash}`);
-
-//     //   const transaction = await MultiSigWalletContract.getTransaction(0);
-//     //   console.log(transaction);
-//     } catch (error) {
-//       console.log(error);
-//       throw new Error("😢 No ethereum object");
-//     }
-//   };
-
+  //     //   const transaction = await MultiSigWalletContract.getTransaction(0);
+  //     //   console.log(transaction);
+  //     } catch (error) {
+  //       console.log(error);
+  //       throw new Error("😢 No ethereum object");
+  //     }
+  //   };
 
   useEffect(() => {
     checkIfWalletisConnected();
-    getContractBalance()
-    getTxCount()
-    getApproverArray()
+    getContractBalance();
+    getTxCount();
+    getApproverArray();
+    // getTxArray()
   }, []);
 
   // wrap around everything and all components have access to data passed into value
@@ -221,7 +254,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         setEtherAmount,
         contractBalance,
         transactionCount,
-        approvers
+        approvers,
+        transactionArray,
       }}
     >
       {children}

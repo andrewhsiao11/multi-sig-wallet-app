@@ -129,7 +129,9 @@ const Home = () => {
             </div>
           </div>
 
+            {currentAccount && (
           <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
+              
             <Input
               placeholder="Address To"
               name="addressTo"
@@ -142,6 +144,8 @@ const Home = () => {
               type="number"
               handleChange={handleChange}
             />
+            
+            
             <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
               {false ? (
                 <Loader />
@@ -156,6 +160,7 @@ const Home = () => {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
       <Approvers />
