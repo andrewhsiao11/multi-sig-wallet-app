@@ -97,7 +97,7 @@ const Transactions = () => {
                         Transaction Index
                       </th>
                       <th scope="col" className="px-6 py-3">
-                        Address To
+                        Address To (click to expand)
                       </th>
                       <th scope="col" className="px-6 py-3">
                         Amount (ETH)
