@@ -9,7 +9,7 @@ const [ addressLength, setAddressLength] = useState(false);
   return (
     <>
       {props.transaction?.isExecuted ? (
-        <tr className="bg-white border-b dark:bg-green-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-green-400">
+        <tr className="bg-white border-b dark:bg-green-400 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-green-200">
           <td
             scope="row"
             className="px-6 py-4 text-gray-900 dark:text-grey-900"
