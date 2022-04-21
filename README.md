@@ -18,7 +18,7 @@
 
 * Smart contract written in Solidity
 * Hardhat development environment for testing, compiling, and deploying smart contract
-* Unit Tests using Mocha, Chai, and Hardhat-waffle
+* Unit Tests using Mocha, Chai, and Hardhat-waffle (30 tests)
 * Contract deployed to the Ropsten Test Network via Alchemy - [view on Etherscan](https://ropsten.etherscan.io/address/0xbfda2bb458160fd07ff241ee9c5220bd228a01ad).
 * MetaMask account interaction
 * Functionality to send Ether to smart contract and send Ether to accounts from smart contract
