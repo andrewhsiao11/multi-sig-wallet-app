@@ -12,7 +12,17 @@ const Profile = () => {
     txIndex,
     getUserApprovalStatus,
     approvalStatus,
+    approveTransaction,
+    numApprovalsRequired,
   } = useContext(MultiSigWalletContext);
+
+  const handleSubmitApproval = (e) => {
+    e.preventDefault();
+    if (txIndex === null || txIndex >= transactionArray.length || txIndex < 0)
+      return;
+      approveTransaction();
+      getUserApprovalStatus();
+  }
 
   const handleGetTxIndex = (e) => {
     // handle not a valid transaction
@@ -20,7 +30,7 @@ const Profile = () => {
     if (txIndex >= transactionArray.length || txIndex < 0)
       return alert("Transaction does not exist at that index");
     e.preventDefault();
-    getUserApprovalStatus(txIndex, currentAccount);
+    getUserApprovalStatus();
   };
 
   return (
@@ -92,16 +102,12 @@ const Profile = () => {
                 {/*  */}
                 {txIndex != null && (
                   <div className="blue-glass p-6">
-                    
-                      <h1 className="text-xl font-medium justify-center text-gray-200">
-                        Current Transaction Index
-                        <br />
-                        <br />
-                        <p className="justify-center flex text-6xl">
-                          {txIndex}
-                        </p>
-                      </h1>
-                    
+                    <h1 className="text-xl font-medium justify-center text-gray-200">
+                      Current Transaction Index
+                      <br />
+                      <br />
+                      <p className="justify-center flex text-6xl">{txIndex}</p>
+                    </h1>
                   </div>
                 )}
                 {/*  */}
@@ -111,17 +117,17 @@ const Profile = () => {
           {/*  */}
           <div className="flex w-full justify-center items-center gradient-bg-approvers">
             <div className="flex mf:flex-row flex-col items-center justify-between  py-12 px-4 mt-20 -mb-20">
-              {true ? (
+              {txIndex != null && !approvalStatus ? (
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
                   <button
                     type="button"
-                    onClick={() => {}}
+                    onClick={handleSubmitApproval}
                     className="text-white w-full border-[1px] p-2 border-[#3d4f7c]  hover:bg-[#009E60] rounded-full cursor-pointer"
                   >
                     Approve
                   </button>
                 </div>
-              ) : false ? (
+              ) : approvalStatus ? (
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
                   <button
                     type="button"
@@ -131,7 +137,7 @@ const Profile = () => {
                     Revoke Approval
                   </button>
                 </div>
-              ) : (
+              ) : (transactionArray[txIndex]?.numApprovals >= numApprovalsRequired) ? (
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
                   <button
                     type="button"
@@ -141,7 +147,7 @@ const Profile = () => {
                     Execute
                   </button>
                 </div>
-              )}
+              ): ""}
             </div>
           </div>
 

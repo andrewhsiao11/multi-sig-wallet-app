@@ -50,6 +50,13 @@ export const MultiSigWalletProvider = ({ children }) => {
   ]);
   const [txIndex, setTxIndex] = useState(null)
   const [approvalStatus, setApprovalStatus] = useState(null);
+  const [numApprovalsRequired, setNumApprovalsRequired] = useState(null)
+
+  const getApprovalsRequired = async () => {
+       const MultiSigWalletContract = getEthereumContract();
+       const apprCount = await MultiSigWalletContract.numApprovalsRequired();
+       setNumApprovalsRequired(parseInt(apprCount._hex));
+  }
 
   const getContractBalance = async () => {
     const MultiSigWalletContract = getEthereumContract();
@@ -91,14 +98,12 @@ export const MultiSigWalletProvider = ({ children }) => {
 
   const handleGetTxIndexChange = (e) => {
       setTxIndex((prev) => prev = e.target.value)
-      console.log(txIndex);
   }
 
-  const getUserApprovalStatus = async (txIndex, currentAccount) => {
+  const getUserApprovalStatus = async () => {
         const MultiSigWalletContract = getEthereumContract();
         const approvalStatus = await MultiSigWalletContract.isApproved(txIndex, currentAccount);
         setApprovalStatus(approvalStatus);
-        console.log(approvalStatus);
   }
 
   // setting each form value to whats typed in based on "name"
@@ -217,40 +222,40 @@ export const MultiSigWalletProvider = ({ children }) => {
       getTxCount();
       setTransactionArray([]);
       getTxArray();
-      //  const transaction = await MultiSigWalletContract.getTransaction(0);
-      //  console.log(transaction);
     } catch (error) {
       console.log(error);
       throw new Error("😢 No ethereum object");
     }
   };
 
-  //   const approveTransaction = async () => {
-  //     try {
-  //       if (!ethereum) return alert("🦊 Please install metamask");
+    const approveTransaction = async () => {
+      try {
+        if (!ethereum) return alert("🦊 Please install metamask");
 
-  //       const MultiSigWalletContract = getEthereumContract();
 
-  //       const txHash = await MultiSigWalletContract.submitTransaction(txIndex);
-  //       setIsLoading(true);
-  //       console.log(`Loading - ${txHash.hash}`);
-  //       await txHash.wait();
-  //       setIsLoading(false);
-  //       console.log(`Success - ${txHash.hash}`);
+        const MultiSigWalletContract = getEthereumContract();
+        const txHash = await MultiSigWalletContract.approveTransaction(txIndex);
+        setIsLoading(true);
+        console.log(`Loading - ${txHash.hash}`);
+        await txHash.wait();
+        setIsLoading(false);
+        console.log(`Success - ${txHash.hash}`);
 
-  //     //   const transaction = await MultiSigWalletContract.getTransaction(0);
-  //     //   console.log(transaction);
-  //     } catch (error) {
-  //       console.log(error);
-  //       throw new Error("😢 No ethereum object");
-  //     }
-  //   };
+        getUserApprovalStatus();
+        setTransactionArray([]);
+        getTxArray();
+      } catch (error) {
+        console.log(error);
+        throw new Error("😢 No ethereum object");
+      }
+    };
 
   useEffect(() => {
     checkIfWalletisConnected();
     getContractBalance();
     getTxCount();
     getApproverArray();
+    getApprovalsRequired()
     // getTxArray()
   }, []);
 
@@ -275,7 +280,9 @@ export const MultiSigWalletProvider = ({ children }) => {
         handleGetTxIndexChange,
         txIndex,
         getUserApprovalStatus,
-        approvalStatus
+        approvalStatus,
+        approveTransaction,
+        numApprovalsRequired,
       }}
     >
       {children}
