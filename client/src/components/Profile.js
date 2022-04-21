@@ -15,7 +15,8 @@ const Profile = () => {
     approveTransaction,
     numApprovalsRequired,
     searchStatus,
-    setSearchStatus
+    setSearchStatus,
+    revokeApproval
   } = useContext(MultiSigWalletContext);
 
   const handleSubmitApproval = (e) => {
@@ -23,7 +24,18 @@ const Profile = () => {
     if (txIndex === null || txIndex >= transactionArray.length || txIndex < 0)
       return;
       approveTransaction();
-      getUserApprovalStatus();
+  }
+
+  const handleRevokeApproval = (e) => {
+    e.preventDefault();
+    if (
+      txIndex === null ||
+      txIndex >= transactionArray.length ||
+      txIndex < 0 ||
+      transactionArray[txIndex]?.numApprovals < numApprovalsRequired
+    )
+      return;
+      revokeApproval();
   }
 
   const handleGetTxIndex = (e) => {
@@ -134,7 +146,7 @@ const Profile = () => {
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
                   <button
                     type="button"
-                    onClick={() => {}}
+                    onClick={handleRevokeApproval}
                     className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#FF5733] rounded-full cursor-pointer"
                   >
                     Revoke Approval

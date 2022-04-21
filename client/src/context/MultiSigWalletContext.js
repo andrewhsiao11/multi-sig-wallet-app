@@ -252,6 +252,27 @@ export const MultiSigWalletProvider = ({ children }) => {
       }
     };
 
+    const revokeApproval = async () => {
+      try {
+        if (!ethereum) return alert("🦊 Please install metamask");
+
+        const MultiSigWalletContract = getEthereumContract();
+        const txHash = await MultiSigWalletContract.revokeApproval(txIndex);
+        setIsLoading(true);
+        console.log(`Loading - ${txHash.hash}`);
+        await txHash.wait();
+        setIsLoading(false);
+        console.log(`Success - ${txHash.hash}`);
+
+        getUserApprovalStatus();
+        setTransactionArray([]);
+        getTxArray();
+      } catch (error) {
+        console.log(error);
+        throw new Error("😢 No ethereum object");
+      }
+    };
+
   useEffect(() => {
     checkIfWalletisConnected();
     getContractBalance();
@@ -286,7 +307,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         approveTransaction,
         numApprovalsRequired,
         searchStatus,
-        setSearchStatus
+        setSearchStatus,
+        revokeApproval
       }}
     >
       {children}
