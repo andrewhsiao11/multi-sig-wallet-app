@@ -16,17 +16,31 @@ const Profile = () => {
     numApprovalsRequired,
     searchStatus,
     setSearchStatus,
-    revokeApproval
+    revokeApproval,
+    executeTransaction,
+    contractBalance,
   } = useContext(MultiSigWalletContext);
 
   const handleSubmitApproval = (e) => {
     e.preventDefault();
     if (txIndex === null || txIndex >= transactionArray.length || txIndex < 0)
       return;
-      approveTransaction();
-  }
+    approveTransaction();
+  };
 
   const handleRevokeApproval = (e) => {
+    e.preventDefault();
+    if (
+      txIndex === null ||
+      txIndex >= transactionArray.length ||
+      txIndex < 0 ||
+      !approvalStatus
+    )
+      return;
+    revokeApproval();
+  };
+
+  const handleExecuteTransaction = (e) => {
     e.preventDefault();
     if (
       txIndex === null ||
@@ -35,8 +49,10 @@ const Profile = () => {
       transactionArray[txIndex]?.numApprovals < numApprovalsRequired
     )
       return;
-      revokeApproval();
-  }
+    if (transactionArray[txIndex]?.amount > contractBalance)
+      return alert("Contract balance is too low. Send more ether to contract.");
+    executeTransaction();
+  };
 
   const handleGetTxIndex = (e) => {
     // handle not a valid transaction
@@ -45,7 +61,7 @@ const Profile = () => {
       return alert("Transaction does not exist at that index");
     e.preventDefault();
     getUserApprovalStatus();
-    setSearchStatus(true)
+    setSearchStatus(true);
   };
 
   return (
@@ -59,7 +75,8 @@ const Profile = () => {
                   Welcome 🦊
                 </h1>
                 <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
-                  Search for a transaction by index here. Approve and revoke below.
+                  Search for a transaction by index here. Approve and revoke
+                  below.
                 </p>
                 <div className="p-4 sm:w-96 w-full flex flex-col justify-start items-center blue-glass mt-7">
                   <form className="w-full max-w-sm">
@@ -132,48 +149,50 @@ const Profile = () => {
           {/*  */}
           <div className="flex w-full justify-center items-center gradient-bg-approvers">
             <div className="flex mf:flex-row flex-col items-center justify-between  py-12 px-4 mt-20 -mb-20">
-              {approvalStatus === false  && searchStatus ? (
-                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
-                  <button
-                    type="button"
-                    onClick={handleSubmitApproval}
-                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c]  hover:bg-[#009E60] rounded-full cursor-pointer"
-                  >
-                    Approve
-                  </button>
-                </div>
-              ) : approvalStatus === true && searchStatus ? (
-                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
-                  <button
-                    type="button"
-                    onClick={handleRevokeApproval}
-                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#FF5733] rounded-full cursor-pointer"
-                  >
-                    Revoke Approval
-                  </button>
-                </div>
-              ) : (
-                ""
+              {!transactionArray[txIndex]?.isExecuted && (
+                <>
+                  {approvalStatus === false && searchStatus ? (
+                    <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
+                      <button
+                        type="button"
+                        onClick={handleSubmitApproval}
+                        className="text-white w-full border-[1px] p-2 border-[#3d4f7c]  hover:bg-[#009E60] rounded-full cursor-pointer"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  ) : approvalStatus === true && searchStatus ? (
+                    <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
+                      <button
+                        type="button"
+                        onClick={handleRevokeApproval}
+                        className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#FF5733] rounded-full cursor-pointer"
+                      >
+                        Revoke Approval
+                      </button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {transactionArray[txIndex]?.numApprovals >=
+                    numApprovalsRequired && searchStatus ? (
+                    <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
+                      <button
+                        type="button"
+                        onClick={handleExecuteTransaction}
+                        className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#6495ED] rounded-full cursor-pointer"
+                      >
+                        Execute
+                      </button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </>
               )}
-              {transactionArray[txIndex]?.numApprovals >= numApprovalsRequired && searchStatus ?
-              (
-              <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
-                <button
-                  type="button"
-                  onClick={() => {}}
-                  className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#6495ED] rounded-full cursor-pointer"
-                >
-                  Execute
-                </button>
-              </div>
-              ) : ( "" )}
             </div>
           </div>
-
           <Transactions />
-          {/* <div className="flex w-full justify-center items-center gradient-bg-transactions">
-            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4"></div>
-          </div> */}
         </>
       ) : (
         <>
