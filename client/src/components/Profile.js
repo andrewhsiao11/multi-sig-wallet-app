@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { MultiSigWalletContext } from "../context/MultiSigWalletContext";
 import { SiEthereum } from "react-icons/si";
+import { Transactions } from "../components";
 
 const Profile = () => {
   const {
@@ -10,11 +11,12 @@ const Profile = () => {
     handleGetTxIndexChange,
     txIndex,
     getUserApprovalStatus,
-    approvalStatus
+    approvalStatus,
   } = useContext(MultiSigWalletContext);
 
   const handleGetTxIndex = (e) => {
     // handle not a valid transaction
+    if (txIndex === null) return;
     if (txIndex >= transactionArray.length || txIndex < 0)
       return alert("Transaction does not exist at that index");
     e.preventDefault();
@@ -29,7 +31,7 @@ const Profile = () => {
             <div className="flex mf:flex-row  items-start justify-between md:p-8 py-12 px-4">
               <div className="flex flex-1 justify-start items-start flex-col mf:mr-10">
                 <h1 className="text-3xl sm:text-5xl text-white py-1">
-                  Welcome User
+                  Welcome 🦊
                 </h1>
                 <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
                   Search for a transaction here and approve and revoke below.
@@ -57,12 +59,14 @@ const Profile = () => {
                       </button>
                     </div>
                   </form>
-
                   <div className="flex">
-                    {approvalStatus === null ? "" : 
-                    (<p className="text-white">
-                      Approved by you: {approvalStatus ? "✅" : "❌"}
-                    </p>)}
+                    {approvalStatus === null ? (
+                      ""
+                    ) : (
+                      <p className="text-white">
+                        Approved by you: {approvalStatus ? "✅" : "❌"}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -85,39 +89,74 @@ const Profile = () => {
                     </div>
                   </div>
                 </div>
+                {/*  */}
+                {txIndex != null && (
+                  <div className="blue-glass p-6">
+                    
+                      <h1 className="text-xl font-medium justify-center text-gray-200">
+                        Current Transaction Index
+                        <br />
+                        <br />
+                        <p className="justify-center flex text-6xl">
+                          {txIndex}
+                        </p>
+                      </h1>
+                    
+                  </div>
+                )}
+                {/*  */}
               </div>
             </div>
-            {/* <div className="flex justify-center py-6">
-              <h1 className="text-3xl sm:text-5xl text-white py-1 mr-10">
-                Welcome
-              </h1>
-            </div> */}
           </div>
           {/*  */}
           <div className="flex w-full justify-center items-center gradient-bg-approvers">
-            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4">
-              <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
-                <input type="text" name="" id=""></input>
-                <br />
-                <input type="text" name="" id=""></input>
-
-                <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
+            <div className="flex mf:flex-row flex-col items-center justify-between  py-12 px-4 mt-20 -mb-20">
+              {true ? (
+                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
                   <button
                     type="button"
                     onClick={() => {}}
-                    className="text-white w-full mt-3 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
+                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c]  hover:bg-[#009E60] rounded-full cursor-pointer"
                   >
-                    Send now
+                    Approve
                   </button>
                 </div>
-              </div>
+              ) : false ? (
+                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
+                  <button
+                    type="button"
+                    onClick={() => {}}
+                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#FF5733] rounded-full cursor-pointer"
+                  >
+                    Revoke Approval
+                  </button>
+                </div>
+              ) : (
+                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
+                  <button
+                    type="button"
+                    onClick={() => {}}
+                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#6495ED] rounded-full cursor-pointer"
+                  >
+                    Execute
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+
+          <Transactions />
+          {/* <div className="flex w-full justify-center items-center gradient-bg-transactions">
+            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4"></div>
+          </div> */}
         </>
       ) : (
         <>
           <div className="flex w-full justify-center items-center gradient-bg-home">
-            <div className="flex mf:flex-row  items-start justify-between md:p-20 py-12 px-4">
+            <div className="flex mf:flex-row  items-start justify-between md:p-20 py-12 px-4"></div>
+          </div>
+          <div className="flex w-full justify-center items-center gradient-bg-approvers">
+            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4">
               <div>
                 <h1 className="w-full text-white text-4xl">
                   Log in to see your account
@@ -134,6 +173,15 @@ const Profile = () => {
                   </p>
                 </button>
               </div>
+            </div>
+          </div>
+          <div className="flex w-full justify-center items-center gradient-bg-transactions">
+            <div className="flex mf:flex-row flex-col items-center justify-between md:p-20 py-12 px-4">
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
             </div>
           </div>
         </>
