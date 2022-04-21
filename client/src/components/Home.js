@@ -29,6 +29,8 @@ const Home = () => {
     etherAmount,
     setEtherAmount,
     contractBalance,
+    isLoading,
+    approvers
   } = useContext(MultiSigWalletContext);
 
   const handleSubmit = (e) => {
@@ -36,9 +38,9 @@ const Home = () => {
     const { addressTo, amount } = formData;
     e.preventDefault();
 
-    if (!addressTo || !amount) return;
+    if (!addressTo || !amount || addressTo.length != 42) return;
 
-    submitTransaction();
+      submitTransaction();
     setFormData({ addressTo: "", amount: 0 });
   };
 
@@ -129,36 +131,39 @@ const Home = () => {
               </div>
             </div>
           </div>
-          {currentAccount && (
-            <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
-              <Input
-                placeholder="Address To"
-                name="addressTo"
-                type="text"
-                handleChange={handleChange}
-              />
-              <Input
-                placeholder="Amount (ETH)"
-                name="amount"
-                type="number"
-                handleChange={handleChange}
-              />
+          {currentAccount &&
+            approvers
+              .map((addr) => addr.toUpperCase())
+              .includes(currentAccount.toUpperCase()) && (
+              <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glass">
+                <Input
+                  placeholder="Address To"
+                  name="addressTo"
+                  type="text"
+                  handleChange={handleChange}
+                />
+                <Input
+                  placeholder="Amount (ETH)"
+                  name="amount"
+                  type="number"
+                  handleChange={handleChange}
+                />
 
-              <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
-                {false ? (
-                  <Loader />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    className="text-white w-full mt-3 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
-                  >
-                    Send now
-                  </button>
-                )}
+                <div className="h-[1px] w-full bg-gray-400 my-2 mb-11">
+                  {isLoading ? (
+                    <Loader />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="text-white w-full mt-3 border-[1px] p-2 border-[#3d4f7c] hover:bg-[#3d4f7c] rounded-full cursor-pointer"
+                    >
+                      Send now
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
       <Approvers />

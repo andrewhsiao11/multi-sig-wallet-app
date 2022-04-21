@@ -329,7 +329,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         searchStatus,
         setSearchStatus,
         revokeApproval,
-        executeTransaction
+        executeTransaction,
+        isLoading
       }}
     >
       {children}
