@@ -51,6 +51,7 @@ export const MultiSigWalletProvider = ({ children }) => {
   const [txIndex, setTxIndex] = useState(null)
   const [approvalStatus, setApprovalStatus] = useState(null);
   const [numApprovalsRequired, setNumApprovalsRequired] = useState(null)
+  const [searchStatus, setSearchStatus] = useState(false)
 
   const getApprovalsRequired = async () => {
        const MultiSigWalletContract = getEthereumContract();
@@ -96,8 +97,9 @@ export const MultiSigWalletProvider = ({ children }) => {
     }
   };
 
-  const handleGetTxIndexChange = (e) => {
+  const handleGetTxIndexChange = async (e) => {
       setTxIndex((prev) => prev = e.target.value)
+      setSearchStatus(false)
   }
 
   const getUserApprovalStatus = async () => {
@@ -283,6 +285,8 @@ export const MultiSigWalletProvider = ({ children }) => {
         approvalStatus,
         approveTransaction,
         numApprovalsRequired,
+        searchStatus,
+        setSearchStatus
       }}
     >
       {children}

@@ -14,6 +14,8 @@ const Profile = () => {
     approvalStatus,
     approveTransaction,
     numApprovalsRequired,
+    searchStatus,
+    setSearchStatus
   } = useContext(MultiSigWalletContext);
 
   const handleSubmitApproval = (e) => {
@@ -31,6 +33,7 @@ const Profile = () => {
       return alert("Transaction does not exist at that index");
     e.preventDefault();
     getUserApprovalStatus();
+    setSearchStatus(true)
   };
 
   return (
@@ -44,7 +47,7 @@ const Profile = () => {
                   Welcome 🦊
                 </h1>
                 <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
-                  Search for a transaction here and approve and revoke below.
+                  Search for a transaction by index here. Approve and revoke below.
                 </p>
                 <div className="p-4 sm:w-96 w-full flex flex-col justify-start items-center blue-glass mt-7">
                   <form className="w-full max-w-sm">
@@ -70,7 +73,7 @@ const Profile = () => {
                     </div>
                   </form>
                   <div className="flex">
-                    {approvalStatus === null ? (
+                    {!searchStatus ? (
                       ""
                     ) : (
                       <p className="text-white">
@@ -117,7 +120,7 @@ const Profile = () => {
           {/*  */}
           <div className="flex w-full justify-center items-center gradient-bg-approvers">
             <div className="flex mf:flex-row flex-col items-center justify-between  py-12 px-4 mt-20 -mb-20">
-              {txIndex != null && !approvalStatus ? (
+              {approvalStatus === false  && searchStatus ? (
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
                   <button
                     type="button"
@@ -127,7 +130,7 @@ const Profile = () => {
                     Approve
                   </button>
                 </div>
-              ) : approvalStatus ? (
+              ) : approvalStatus === true && searchStatus ? (
                 <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
                   <button
                     type="button"
@@ -137,17 +140,21 @@ const Profile = () => {
                     Revoke Approval
                   </button>
                 </div>
-              ) : (transactionArray[txIndex]?.numApprovals >= numApprovalsRequired) ? (
-                <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass mr-8">
-                  <button
-                    type="button"
-                    onClick={() => {}}
-                    className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#6495ED] rounded-full cursor-pointer"
-                  >
-                    Execute
-                  </button>
-                </div>
-              ): ""}
+              ) : (
+                ""
+              )}
+              {transactionArray[txIndex]?.numApprovals >= numApprovalsRequired && searchStatus ?
+              (
+              <div className="p-5 sm:w-96 w-full flex flex-col justify-start rounded-full items-center blue-glass ml-8">
+                <button
+                  type="button"
+                  onClick={() => {}}
+                  className="text-white w-full border-[1px] p-2 border-[#3d4f7c] hover:bg-[#6495ED] rounded-full cursor-pointer"
+                >
+                  Execute
+                </button>
+              </div>
+              ) : ( "" )}
             </div>
           </div>
 
