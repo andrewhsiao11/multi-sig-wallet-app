@@ -6,7 +6,7 @@ import approver_walterWhite from "../images/approver_walterWhite.png";
 import approver_mando from "../images/approver_mando.png";
 
 const Approvers = () => {
-  const { currentAccount, transactionCount, approvers } = useContext(MultiSigWalletContext);
+  const { currentAccount, transactionCount, approvers, numApprovalsRequired } = useContext(MultiSigWalletContext);
 
   
   
@@ -26,7 +26,7 @@ const Approvers = () => {
                     </p>
                   </div>
                   <p className="text-sm text-gray-400 w-1/2 mt-2">
-                    Approvals required: 2
+                    Approvals required: {numApprovalsRequired}
                   </p>
                 </div>
               </div>
