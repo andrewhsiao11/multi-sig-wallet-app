@@ -47,6 +47,8 @@ export const MultiSigWalletProvider = ({ children }) => {
     "0x1b1365cdc8f14f5fdec982ac8554db8b5628c0ee866c5e37aac88b9847bb5aa1",
     "0x48d800b04522671e2d63bf7d5fc70b818df499c42a47ab019bebb19f7b8ffe0c",
     "0x4ab6bdb7f373d7bf7cf72b54cace8c9ba4b44c3fa3a11d40ea8b9f19dcf69532",
+    "0x86cd2c95da2ab52560a60b431965f6109dcda651eb8fa6046b1d8ba0eb1ee08e",
+    "0x7081e33ef48da14c2f2ed16f25196d0f0a8cf4df018747cb388124c9d414c813",
   ]);
   const [txIndex, setTxIndex] = useState(null)
   const [approvalStatus, setApprovalStatus] = useState(null);
